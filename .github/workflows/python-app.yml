@@ -28,8 +28,8 @@ jobs:
           python autoUrl.py
       - name: 暂存提交
         run: |
-          git config --global user.name 'hl128k'
-          git config --global user.email 'hl128k@qq.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           export TZ='Asia/Shanghai'
           git add .
           git commit -m "update" -a

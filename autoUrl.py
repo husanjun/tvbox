@@ -1,4 +1,4 @@
-﻿import base64
+import base64
 import re
 import datetime
 import requests
@@ -15,9 +15,7 @@ def main():
     reList = ["https://ghproxy.net/https://raw.githubusercontent.com", "https://raw.kkgithub.com",
               "https://gcore.jsdelivr.net/gh", "https://mirror.ghproxy.com/https://raw.githubusercontent.com",
               "https://github.moeyy.xyz/https://raw.githubusercontent.com", "https://fastly.jsdelivr.net/gh"]
-    reRawList = [False, False,
-                 True, False,
-                 False, True]
+    reRawList = [False, False, True, False, False, True]
     for item in urlJson:
         urlData = get_json(item["url"])
         for reI in range(len(reList)):
@@ -35,6 +33,12 @@ def main():
                 .replace('"https://github.com', '"' + reList[reI]) \
                 .replace("'https://raw.githubusercontent.com", "'" + reList[reI]) \
                 .replace('"https://raw.githubusercontent.com', '"' + reList[reI])
+
+            for url in reList:
+                if reRawList[reI]:
+                    continue
+                reqText = reqText.replace(url, reList[reI])
+
             fp = open("./tv/" + str(reI) + "/" + urlName + ".json", "w+", encoding='utf-8')
             fp.write(reqText)
     now = datetime.datetime.now()
@@ -62,6 +66,7 @@ def main():
     fp.write("如果感兴趣,请复制项目后自行研究使用\n\n")
     fp.close()
 
+
 def get_json(url):
     key = url.split(";")[2] if ";" in url else ""
     url = url.split(";")[0] if ";" in url else url
@@ -77,11 +82,14 @@ def get_json(url):
     if key:
         data = ecb_decrypt(data, key)
     return data
+
+
 def get_ext(ext):
     try:
         return base64_decode(get_data(ext[4:]))
     except Exception:
         return ""
+
 
 def get_data(url):
     if url.startswith("http"):
@@ -89,9 +97,11 @@ def get_data(url):
         return urlReq.text
     return ""
 
+
 def ecb_decrypt(data, key):
     spec = AES.new(pad_end(key).encode(), AES.MODE_ECB)
     return spec.decrypt(bytes.fromhex(data)).decode("utf-8")
+
 
 def cbc_decrypt(data):
     decode = bytes.fromhex(data).decode().lower()
@@ -102,16 +112,20 @@ def cbc_decrypt(data):
     decrypt_data = key_spec.decrypt(bytes.fromhex(data))
     return decrypt_data.decode("utf-8")
 
+
 def base64_decode(data):
     extract = extract_base64(data)
     return base64.b64decode(extract).decode("utf-8") if extract else data
+
 
 def extract_base64(data):
     match = re.search(r"[A-Za-z0-9]{8}\*\*", data)
     return data[data.index(match.group()) + 10:] if match else ""
 
+
 def pad_end(key):
     return key + "0000000000000000"[:16 - len(key)]
+
 
 def is_valid_json(json_str):
     try:
