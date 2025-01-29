@@ -28,7 +28,7 @@ jobs:
           python autoUrl.py
       - name: 暂存提交
         run: |
-          git config --global user.name 'github[robot]'
+          git config --global user.name 'github-actions[bot]'
           git config --global user.email ''
           export TZ='Asia/Shanghai'
           git add .
